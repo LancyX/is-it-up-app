@@ -1,5 +1,6 @@
 import os
 from datetime import datetime
+import pytz
 from fastapi import FastAPI
 from fastapi.responses import HTMLResponse
 from fastapi.staticfiles import StaticFiles
@@ -12,7 +13,7 @@ app.mount("/static", StaticFiles(directory="static"), name="static")
 @app.get("/", response_class=HTMLResponse)
 async def read_root():
 
-    now = datetime.now()
+    now = datetime.now(pytz.timezone('Europe/Kyiv'))
     timestamp = now.strftime("%d/%m %H:%M:%S")
 
     last_change = read_file("last-change")
