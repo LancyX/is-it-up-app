@@ -32,3 +32,8 @@ p {
     font-size: 1em;
     margin: 10px 0;
 }
+
+img {
+    width: 150px;
+    height: 150px;
+}
