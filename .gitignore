@@ -162,5 +162,8 @@ cython_debug/
 # local status files
 static/last-change
 static/status
+static/updated
+
+# trash files
 static/.DS_Store
 static/img/.DS_Store
