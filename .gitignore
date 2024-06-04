@@ -167,3 +167,9 @@ static/updated
 # trash files
 static/.DS_Store
 static/img/.DS_Store
+
+# sqlite database
+*.db
+
+# test script
+test.py

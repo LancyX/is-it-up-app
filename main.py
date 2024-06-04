@@ -3,7 +3,7 @@ from fastapi import FastAPI
 from fastapi.responses import HTMLResponse
 from fastapi.staticfiles import StaticFiles
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
-from basic import read_file, crontask
+from basic import crontask, get_status
 
 app = FastAPI()
 
@@ -27,17 +27,26 @@ async def lifespan(app: FastAPI):
 
 app.router.lifespan_context = lifespan
 
-scheduler.add_job(crontask, 'interval', minutes=1)
+scheduler.add_job(crontask, 'interval', seconds=10)
 
 @app.get("/api/data")
 async def get_data():
-    last_change = await read_file("last-change")
-    power = await read_file("status")
-    updated = await read_file("updated")
+    status_data = await get_status()
+    power = status_data["status"]
+    updated = status_data["updated"]
+    last_power_on = status_data["last_power_on"]
+    last_power_off = status_data["last_power_off"]
+    interval_previous = status_data["interval_previous"]
+    interval = status_data["interval"]
 
-    data = {"power": power,
+    data = {
+            "power": power,
             "timestamp": updated,
-            "last_change": last_change}
+            "last_power_on": last_power_on,
+            "last_power_off": last_power_off,
+            "interval_previous": interval_previous,
+            "interval": interval
+            }
 
     return data
 
@@ -58,69 +67,45 @@ async def read_root():
                 const response = await fetch('/api/data');
                 const data = await response.json();
                 let power_text;
-                if (data.power == 1) {
-                    power_text = 'наявне'
+                if (data.power == "OK") {
+                    power_text = 'Наявне впродовж'
                 } else {
-                    power_text = 'відсутнє'
+                    power_text = 'Відсутнє впродовж'
                 }
-                document.getElementById('power').innerHTML = '<strong>Електропостачання</strong>: ' + power_text;
-                document.getElementById('timestamp').innerHTML = '<strong>Час оновлення данних</strong>: ' + data.timestamp;
-                document.getElementById('last_change').innerHTML = '<strong>Остання зміна статусу</strong>: ' + data.last_change;
+
+                let last_power_text;
+                if (data.power == "OK") {
+                    last_power_text = 'Було відсутнє впродовж'
+                } else {
+                    last_power_text = 'Було наявне впродовж'
+                }
+
+                document.getElementById('power').innerHTML = '<strong>' + power_text + '</strong>: ' + data.interval;
+                document.getElementById('timestamp').innerHTML = '<strong>Дані оновлено</strong>: ' + data.timestamp;
+                document.getElementById('interval').innerHTML = '<strong>' + last_power_text + '</strong>: ' + data.interval_previous;
+                document.getElementById('last_power_on').innerHTML = '<strong>Останнє включення</strong>: ' + data.last_power_on;
+                document.getElementById('last_power_off').innerHTML = '<strong>Останнє відключення</strong>: ' + data.last_power_off;
                 const img = document.getElementById('power_img');
-                img.src = data.power == 1 ? '/static/img/power-on.png' : '/static/img/power-off.png';
+                img.src = data.power == "OK" ? '/static/img/power-on.png' : '/static/img/power-off.png';
             }
 
             setInterval(fetchData, 30000);  // Fetch data every 30 seconds
             window.onload = fetchData;
         </script>
-        <style>
-            body {
-                display: flex;
-                justify-content: center;
-                align-items: center;
-                min-height: 100vh;
-                margin: 0;
-                font-family: Arial, sans-serif;
-                background-color: #f0f0f0;
-            }
-
-            .container {
-                text-align: center;
-                background: white;
-                padding: 20px;
-                border-radius: 8px;
-                box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-            }
-
-            img {
-                max-width: 100%;
-                height: auto;
-                border-radius: 8px;
-            }
-
-            h1 {
-                font-size: 2em;
-                margin-bottom: 20px;
-            }
-
-            p {
-                font-size: 1em;
-                margin: 10px 0;
-            }
-
-            img {
-                width: 150px;
-                height: 150px;
-            }
-        </style>
     </head>
     <body>
         <div class="container">
+            <h1>Вишневе</h1>
             <h1>вул. Машинобудівників, буд. 23</h1>
             <img id="power_img" src="/static/img/power-off.png" alt="Power Status">
+            <p><strong>Поточні дані</strong>:</p>
             <p id="power"><strong>Електропостачання</strong>: </p>
-            <p id="timestamp"><strong>Час оновлення данних</strong>: </p>
-            <p id="last_change"><strong>Остання зміна статусу</strong>: </p>
+            <p id="timestamp"><strong>Дані оновлено</strong>: </p>
+            <p><strong>.</strong></p>
+            <p><strong>Попередні дані</strong>:</p>
+            <p id="interval"><strong>|</strong></p>
+            <p id="last_power_on"><strong>Останнє включення</strong>: </p>
+            <p id="last_power_off"><strong>Останнє відключення</strong>: </p>
         </div>
     </body>
     </html>
