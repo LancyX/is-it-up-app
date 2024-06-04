@@ -18,7 +18,7 @@ async def update_status(metric: str,
 
 async def get_interval(t1: str,
                        t2: str):
-    format_str = "%y-%m-%d %H:%M:%S"
+    format_str = "%Y-%m-%d %H:%M:%S"
     dt1 = datetime.strptime(t1, format_str)
     dt2 = datetime.strptime(t2, format_str)
 
@@ -47,7 +47,7 @@ async def get_interval(t1: str,
 
 async def crontask():
     now = datetime.now(pytz.timezone('Europe/Kyiv'))
-    timestamp = now.strftime("%y-%m-%d %H:%M:%S")
+    timestamp = now.strftime("%Y-%m-%d %H:%M:%S")
 
     status_data = await get_status()
     known_status = status_data["status"]
