@@ -47,8 +47,6 @@ async def get_interval(t1: str,
         formatted_diff += f"{minutes} хвилин, "
 
     interval = formatted_diff.strip(", ")
-    print(formatted_diff)
-    print(interval)
     return interval
 
 async def crontask():
@@ -60,22 +58,18 @@ async def crontask():
     last_power_off = status_data["last_power_off"]
     last_power_on = status_data["last_power_on"]
     power = await telnet()
-    print("prev")
     interval_previous = await get_interval(t1=last_power_off,
                                            t2=last_power_on)
 
     if known_status == power and power == "OK":
-        print("OK - curr")
         interval = await get_interval(t1=timestamp,
                                       t2=last_power_on)
         await update_status(metric="interval", value=interval)
     if known_status == power and power == "ERR":
-        print("ERR - curr")
         interval = await get_interval(t1=timestamp,
                                       t2=last_power_off)
         await update_status(metric="interval", value=interval)
     elif known_status != power:
-        print("DIFF - curr")
         interval = await get_interval(t1=timestamp,
                                       t2=last_power_off)
         await update_status(metric="interval", value=interval)
