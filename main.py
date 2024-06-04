@@ -1,8 +1,8 @@
+from contextlib import asynccontextmanager
 from fastapi import FastAPI
 from fastapi.responses import HTMLResponse
 from fastapi.staticfiles import StaticFiles
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
-from contextlib import asynccontextmanager
 from basic import read_file, crontask
 
 app = FastAPI()
@@ -31,9 +31,9 @@ scheduler.add_job(crontask, 'interval', minutes=1)
 
 @app.get("/api/data")
 async def get_data():
-    last_change = read_file("last-change")
-    power = read_file("status")
-    updated = read_file("updated")
+    last_change = await read_file("last-change")
+    power = await read_file("status")
+    updated = await read_file("updated")
 
     data = {"power": power,
             "timestamp": updated,
