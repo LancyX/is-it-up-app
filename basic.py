@@ -57,9 +57,13 @@ async def crontask():
     interval_previous = await get_interval(t1=last_power_off,
                                            t2=last_power_on)
 
-    if known_status == power:
+    if known_status == power and power == "OK":
         interval = await get_interval(t1=timestamp,
                                       t2=last_power_on)
+        await update_status(metric="interval", value=interval)
+    if known_status == power and power == "ERR":
+        interval = await get_interval(t1=timestamp,
+                                      t2=last_power_off)
         await update_status(metric="interval", value=interval)
     else:
         interval = await get_interval(t1=timestamp,

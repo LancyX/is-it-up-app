@@ -98,11 +98,10 @@ async def read_root():
             <h1>Вишневе</h1>
             <h1>вул. Машинобудівників, буд. 23</h1>
             <img id="power_img" src="/static/img/power-off.png" alt="Power Status">
-            <p><strong>Поточні дані</strong>:</p>
+            <h3><strong>Поточні дані</strong>:</h3>
             <p id="power"><strong>Електропостачання</strong>: </p>
             <p id="timestamp"><strong>Дані оновлено</strong>: </p>
-            <p><strong>.</strong></p>
-            <p><strong>Попередні дані</strong>:</p>
+            <h3><strong>Попередні дані</strong>:</h3>
             <p id="interval"><strong>|</strong></p>
             <p id="last_power_on"><strong>Останнє включення</strong>: </p>
             <p id="last_power_off"><strong>Останнє відключення</strong>: </p>
