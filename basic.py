@@ -27,12 +27,18 @@ async def get_interval(t1: str,
     else:
         time_diff = dt2 - dt1
 
-    days = time_diff.days
-    hours, remainder = divmod(time_diff.seconds, 3600)
-    minutes, seconds = divmod(remainder, 60)
+    years = abs(time_diff.days // 365)
+    months = abs((time_diff.days % 365) // 30)
+    days = abs(time_diff.days % 365 % 30)
+    hours = abs(time_diff.seconds // 3600)
+    minutes = abs((time_diff.seconds % 3600) // 60)
 
     # Format the difference
     formatted_diff = ""
+    if years:
+        formatted_diff += f"{years} років, "
+    if months:
+        formatted_diff += f"{months} місяців, "
     if days:
         formatted_diff += f"{days} днів, "
     if hours:
@@ -41,6 +47,8 @@ async def get_interval(t1: str,
         formatted_diff += f"{minutes} хвилин, "
 
     interval = formatted_diff.strip(", ")
+    print(formatted_diff)
+    print(interval)
     return interval
 
 async def crontask():
@@ -52,18 +60,22 @@ async def crontask():
     last_power_off = status_data["last_power_off"]
     last_power_on = status_data["last_power_on"]
     power = await telnet()
+    print("prev")
     interval_previous = await get_interval(t1=last_power_off,
                                            t2=last_power_on)
 
     if known_status == power and power == "OK":
+        print("OK - curr")
         interval = await get_interval(t1=timestamp,
                                       t2=last_power_on)
         await update_status(metric="interval", value=interval)
     if known_status == power and power == "ERR":
+        print("ERR - curr")
         interval = await get_interval(t1=timestamp,
                                       t2=last_power_off)
         await update_status(metric="interval", value=interval)
-    else:
+    elif known_status != power:
+        print("DIFF - curr")
         interval = await get_interval(t1=timestamp,
                                       t2=last_power_off)
         await update_status(metric="interval", value=interval)
