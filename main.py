@@ -27,7 +27,7 @@ async def lifespan(app: FastAPI):
 
 app.router.lifespan_context = lifespan
 
-scheduler.add_job(crontask, 'interval', seconds=10)
+scheduler.add_job(crontask, 'interval', seconds=30)
 
 @app.get("/api/data")
 async def get_data():
