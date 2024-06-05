@@ -1,23 +1,45 @@
+"""Basic functions for appd"""
 import os
 import socket
 from datetime import datetime
 import pytz
 from db import Database
 
-async def get_status():
+async def get_all_status():
+    """return all data from table"""
     db = Database()
     result = db.get_all(table="power_status")
     return result
 
+async def get_last_status():
+    """return most recent data from table"""
+    db = Database()
+    result = db.get_last(table="power_status")
+    return result
+
+async def get_prev_status():
+    """return previous status data from table"""
+    db = Database()
+    result = db.get_prev(table="power_status")
+    return result
+
 async def update_status(metric: str,
                         value: str):
+    """update values in rows"""
     db = Database()
     db.update_status(table="power_status",
                      metric=metric,
                      value=value)
 
+async def insert_new_status(data: dict):
+    """insert new row"""
+    db = Database()
+    db.insert_status_row(table="power_status",
+                         data=data)
+
 async def get_interval(t1: str,
                        t2: str):
+    """return diff between 2 given timestamps"""
     format_str = "%Y-%m-%d %H:%M"
     dt1 = datetime.strptime(t1, format_str)
     dt2 = datetime.strptime(t2, format_str)
@@ -50,46 +72,46 @@ async def get_interval(t1: str,
     return interval
 
 async def crontask():
+    """main task which checks telnet connection and updates statuses"""
     now = datetime.now(pytz.timezone('Europe/Kyiv'))
     timestamp = now.strftime("%Y-%m-%d %H:%M")
 
-    status_data = await get_status()
+    status_data = await get_last_status()
     known_status = status_data["status"]
-    last_power_off = status_data["last_power_off"]
-    last_power_on = status_data["last_power_on"]
+
     power = await telnet()
-    interval_previous = await get_interval(t1=last_power_off,
-                                           t2=last_power_on)
-
-    if known_status == power and power == "OK":
-        interval = await get_interval(t1=timestamp,
-                                      t2=last_power_on)
-        await update_status(metric="interval", value=interval)
-    if known_status == power and power == "ERR":
-        interval = await get_interval(t1=timestamp,
-                                      t2=last_power_off)
-        await update_status(metric="interval", value=interval)
-    elif known_status != power:
-        interval = await get_interval(t1=timestamp,
-                                      t2=last_power_off)
-        await update_status(metric="interval", value=interval)
-
-        await update_status(metric="status", value=power)
+    prev = await get_prev_status()
+    interval_previous = await get_interval(t1=prev["inserted"],
+                                           t2=status_data["inserted"])
 
     if known_status == power:
-        pass
-    elif known_status == "OK" and power == "ERR":
-        await update_status(metric="last_power_off", value=timestamp)
-    elif known_status == "ERR" and power == "OK":
-        await update_status(metric="last_power_on", value=timestamp)
+        interval = await get_interval(t1=timestamp,
+                                      t2=status_data["inserted"])
 
-    await update_status(metric="updated", value=timestamp)
-    await update_status(metric="interval_previous", value=interval_previous)
+    elif known_status != power and power == "OK":
+        interval = "0 хвилин"
+    elif known_status != power and power == "ERR":
+        interval = "0 хвилин"
+
+    if known_status == power:
+        await update_status(metric="updated", value=timestamp)
+        await update_status(metric="interval", value=interval)
+        await update_status(metric="interval_previous", value=interval_previous)
+    else:
+        data = {
+                "status": power,
+                "updated": timestamp,
+                "interval": interval,
+                "interval_previous": interval_previous,
+                "inserted": timestamp
+                }
+
+        await insert_new_status(data=data)
 
 async def telnet():
     """
     Check if a specific port on a host is open.
-    Returns True if the port is open, False otherwise.
+    Returns OK if the port is open, ERR otherwise.
     """
     host = os.getenv("HOME_HOST")
     port = int(os.getenv("HOME_PORT"))
@@ -106,3 +128,9 @@ async def telnet():
         return "ERR"
     finally:
         sock.close()
+
+async def read_html(source: str):
+    """return desired html page content"""
+    with open(f"html/{source}.html", "r", encoding="utf-8") as file:
+        # Reading from a file
+        return file.read()

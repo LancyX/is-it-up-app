@@ -3,7 +3,7 @@ from fastapi import FastAPI
 from fastapi.responses import HTMLResponse
 from fastapi.staticfiles import StaticFiles
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
-from basic import crontask, get_status
+from basic import crontask, get_all_status, get_last_status, get_prev_status, read_html
 
 app = FastAPI()
 
@@ -14,7 +14,7 @@ scheduler = AsyncIOScheduler()
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    # Set up rate limiting
+    """Set up rate limiting"""
 
     # Start the scheduler
     scheduler.start()
@@ -27,17 +27,24 @@ async def lifespan(app: FastAPI):
 
 app.router.lifespan_context = lifespan
 
-scheduler.add_job(crontask, 'interval', seconds=30)
+# scheduler.add_job(crontask, 'interval', seconds=30)
 
-@app.get("/api/data")
+@app.get("/api/main")
 async def get_data():
-    status_data = await get_status()
-    power = status_data["status"]
-    updated = status_data["updated"]
-    last_power_on = status_data["last_power_on"]
-    last_power_off = status_data["last_power_off"]
-    interval_previous = status_data["interval_previous"]
-    interval = status_data["interval"]
+    """return json with data for frontend"""
+    status = await get_last_status()
+    prev_status = await get_prev_status()
+    power = status["status"]
+    updated = status["updated"]
+    interval_previous = status["interval_previous"]
+    interval = status["interval"]
+
+    if status["status"] == "OK":
+        last_power_on = status["inserted"]
+        last_power_off = prev_status["inserted"]
+    else:
+        last_power_on = prev_status["inserted"]
+        last_power_off = status["inserted"]
 
     data = {
             "power": power,
@@ -50,65 +57,34 @@ async def get_data():
 
     return data
 
+@app.get("/api/prev-data")
+async def get_prev_data_table():
+    """return json with data for frontend"""
+    data = await get_all_status()
+    for item in data:
+        if item["status"] == "OK":
+            item["status"] = "Включення"
+        elif item["status"] == "ERR":
+            item["status"] = "Відключення"
+    return data
+
 @app.get("/", response_class=HTMLResponse)
 async def read_root():
+    """return main.html with root page"""
+    # html_content = await read_html(source="main")
+    html_content = await read_html(source="maintenance")
+    return HTMLResponse(content=html_content)
 
-    # Render the HTML template
-    html_content = """
-    <!DOCTYPE html>
-    <html lang="en">
-    <head>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>Power Status</title>
-        <link rel="stylesheet" type="text/css" href="/static/styles.css">
-        <script>
-            async function fetchData() {
-                const response = await fetch('/api/data');
-                const data = await response.json();
-                let power_text;
-                if (data.power == "OK") {
-                    power_text = 'Наявне впродовж'
-                } else {
-                    power_text = 'Відсутнє впродовж'
-                }
+@app.get("/prev-data", response_class=HTMLResponse)
+async def read_prev_data():
+    """return main.html with root page"""
+    html_content = await read_html(source="prev-data")
+    return HTMLResponse(content=html_content)
 
-                let last_power_text;
-                if (data.power == "OK") {
-                    last_power_text = 'Було відсутнє впродовж'
-                } else {
-                    last_power_text = 'Було наявне впродовж'
-                }
-
-                document.getElementById('power').innerHTML = '<strong>' + power_text + '</strong>: ' + data.interval;
-                document.getElementById('timestamp').innerHTML = '<strong>Дані оновлено</strong>: ' + data.timestamp;
-                document.getElementById('interval').innerHTML = '<strong>' + last_power_text + '</strong>: ' + data.interval_previous;
-                document.getElementById('last_power_on').innerHTML = '<strong>Останнє включення</strong>: ' + data.last_power_on;
-                document.getElementById('last_power_off').innerHTML = '<strong>Останнє відключення</strong>: ' + data.last_power_off;
-                const img = document.getElementById('power_img');
-                img.src = data.power == "OK" ? '/static/img/power-on.png' : '/static/img/power-off.png';
-            }
-
-            setInterval(fetchData, 30000);  // Fetch data every 30 seconds
-            window.onload = fetchData;
-        </script>
-    </head>
-    <body>
-        <div class="container">
-            <h1>Вишневе</h1>
-            <h1>вул. Машинобудівників, буд. 23</h1>
-            <img id="power_img" src="/static/img/power-off.png" alt="Power Status">
-            <h3><strong>Поточні дані</strong>:</h3>
-            <p id="power"><strong>Електропостачання</strong>: </p>
-            <p id="timestamp"><strong>Дані оновлено</strong>: </p>
-            <h3><strong>Попередні дані</strong>:</h3>
-            <p id="interval"><strong>|</strong></p>
-            <p id="last_power_on"><strong>Останнє включення</strong>: </p>
-            <p id="last_power_off"><strong>Останнє відключення</strong>: </p>
-        </div>
-    </body>
-    </html>
-    """
+@app.get("/contact", response_class=HTMLResponse)
+async def read_contact():
+    """return main.html with root page"""
+    html_content = await read_html(source="contact")
     return HTMLResponse(content=html_content)
 
 if __name__ == "__main__":

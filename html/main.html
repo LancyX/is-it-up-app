@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+    <html lang="ua">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Power Status</title>
+        <link rel="stylesheet" type="text/css" href="/static/styles.css">
+        <script src="/static/scripts/main-fetch.js"></script>
+        <nav>
+            <div class="menu-icon" onclick="toggleMenu()">☰</div>
+            <ul id="nav-menu">
+              <li><a href="/">Головна</a></li>
+              <li><a href="/prev-data">Таблиця</a></li>
+              <li><a href="/contact">Контакти</a></li>
+            </ul>
+        </nav>
+    </head>
+    <script src="/static/scripts/nagivation.js"></script>
+    <body>
+        <div class="container">
+            <h2>м. Вишневе</h2>
+            <h2>вул. Машинобудівників, буд. 23</h2>
+            <img id="power_img" src="/static/img/power-off.png" alt="Power Status">
+            <h3><strong>Поточні дані</strong>:</h3>
+            <p id="power"><strong>Електропостачання</strong>: </p>
+            <p id="timestamp"><strong>Дані оновлено</strong>: </p>
+            <h3><strong>Попередні дані</strong>:</h3>
+            <p id="interval"><strong>|</strong></p>
+            <p id="last_power_on"><strong>Останнє включення</strong>: </p>
+            <p id="last_power_off"><strong>Останнє відключення</strong>: </p>
+        </div>
+    </body>
+    </html>
