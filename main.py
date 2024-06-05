@@ -27,7 +27,7 @@ async def lifespan(app: FastAPI):
 
 app.router.lifespan_context = lifespan
 
-# scheduler.add_job(crontask, 'interval', seconds=30)
+scheduler.add_job(crontask, 'interval', seconds=30)
 
 @app.get("/api/main")
 async def get_data():
@@ -71,8 +71,8 @@ async def get_prev_data_table():
 @app.get("/", response_class=HTMLResponse)
 async def read_root():
     """return main.html with root page"""
-    # html_content = await read_html(source="main")
-    html_content = await read_html(source="maintenance")
+    html_content = await read_html(source="main")
+    # html_content = await read_html(source="maintenance")
     return HTMLResponse(content=html_content)
 
 @app.get("/prev-data", response_class=HTMLResponse)
