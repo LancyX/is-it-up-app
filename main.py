@@ -63,9 +63,9 @@ async def get_prev_data_table():
     data = await get_all_status()
     for item in data:
         if item["status"] == "OK":
-            item["status"] = "Включення"
+            item["status"] = "Наявне"
         elif item["status"] == "ERR":
-            item["status"] = "Відключення"
+            item["status"] = "Відсутнє"
     return data
 
 @app.get("/", response_class=HTMLResponse)

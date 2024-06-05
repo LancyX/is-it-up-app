@@ -134,6 +134,8 @@ nav {
   .menu-icon {
     display: none;
     cursor: pointer;
+    font-family: Arial, sans-serif;
+    font-size: 40px;
   }
 
   #nav-menu {

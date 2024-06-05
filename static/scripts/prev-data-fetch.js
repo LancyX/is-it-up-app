@@ -9,7 +9,7 @@ fetch('/api/prev-data')
 
     // Loop through the data and create table rows
     data.forEach(item => {
-        if (item.status == "Включення") {
+        if (item.status == "Наявне") {
             status_value = "ok"
         } else {
             status_value = "err"
@@ -20,7 +20,6 @@ fetch('/api/prev-data')
             <td>${item.status}</td>
             <td>${item.updated}</td>
             <td>${item.interval}</td>
-            <!-- Add more cells if needed -->
         `;
         console.log(`status-${status_value}`)
         row.classList.add(`status-${status_value}`);
