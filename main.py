@@ -3,7 +3,9 @@ from fastapi import FastAPI
 from fastapi.responses import HTMLResponse
 from fastapi.staticfiles import StaticFiles
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
-from basic import crontask, get_all_status, get_last_status, get_prev_status, read_html
+from basic import crontask, get_all_status, get_last_status, get_prev_status, read_html, LANGUAGE
+from translation import read_translation, read_titles
+from models import Translation
 
 app = FastAPI()
 
@@ -29,6 +31,8 @@ app.router.lifespan_context = lifespan
 
 scheduler.add_job(crontask, 'interval', seconds=30)
 
+# API DATA Section
+
 @app.get("/api/main")
 async def get_data():
     """return json with data for frontend"""
@@ -47,26 +51,38 @@ async def get_data():
         last_power_off = status["inserted"]
 
     data = {
-            "power": power,
+            "status": power,
             "timestamp": updated,
-            "last_power_on": last_power_on,
-            "last_power_off": last_power_off,
+            "last_on": last_power_on,
+            "last_off": last_power_off,
             "interval_previous": interval_previous,
             "interval": interval
             }
 
     return data
 
-@app.get("/api/prev-data")
+@app.get("/api/table")
 async def get_prev_data_table():
     """return json with data for frontend"""
     data = await get_all_status()
-    for item in data:
-        if item["status"] == "OK":
-            item["status"] = "Наявне"
-        elif item["status"] == "ERR":
-            item["status"] = "Відсутнє"
     return data
+
+# API Translation Section
+
+@app.post("/api/translation")
+async def get_translation(request: Translation):
+    """return json with translation data for frontend"""
+    data = await read_translation(language=LANGUAGE)
+    data = data[request.page]
+    return data
+
+@app.get("/api/titles")
+async def get_titles():
+    """return json with titles data for frontend"""
+    data = await read_titles()
+    return data
+
+# HTML Section
 
 @app.get("/", response_class=HTMLResponse)
 async def read_root():
@@ -75,10 +91,16 @@ async def read_root():
     # html_content = await read_html(source="maintenance")
     return HTMLResponse(content=html_content)
 
+@app.get("/table", response_class=HTMLResponse)
+async def read_table():
+    """return main.html with root page"""
+    html_content = await read_html(source="table")
+    return HTMLResponse(content=html_content)
+
 @app.get("/prev-data", response_class=HTMLResponse)
 async def read_prev_data():
     """return main.html with root page"""
-    html_content = await read_html(source="prev-data")
+    html_content = await read_html(source="table")
     return HTMLResponse(content=html_content)
 
 @app.get("/contact", response_class=HTMLResponse)

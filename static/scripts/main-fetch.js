@@ -1,27 +1,37 @@
+import fetchTitles from '/static/scripts/titles.js';
+import fetchNav from '/static/scripts/nav.js';
+import fetchTranslation from '/static/scripts/translations.js';
+
 async function fetchData() {
+    await fetchTitles()
+    await fetchNav('main')
+
+    const translation = await fetchTranslation("main");
+
     const response = await fetch('/api/main');
     const data = await response.json();
-    let power_text;
-    if (data.power == "OK") {
-        power_text = 'Наявне впродовж'
+
+
+    let status_text;
+    let last_status_text;
+
+    if (data.status == "OK") {
+        status_text = translation.status_on
+        last_status_text = translation.prev_status_on
     } else {
-        power_text = 'Відсутнє впродовж'
+        status_text = translation.status_off
+        last_status_text = translation.prev_status_off
     }
 
-    let last_power_text;
-    if (data.power == "OK") {
-        last_power_text = 'Було відсутнє впродовж'
-    } else {
-        last_power_text = 'Було наявне впродовж'
-    }
-
-    document.getElementById('power').innerHTML = '<strong>' + power_text + '</strong>: ' + data.interval;
-    document.getElementById('timestamp').innerHTML = '<strong>Дані оновлено</strong>: ' + data.timestamp;
-    document.getElementById('interval').innerHTML = '<strong>' + last_power_text + '</strong>: ' + data.interval_previous;
-    document.getElementById('last_power_on').innerHTML = '<strong>Останнє включення</strong>: ' + data.last_power_on;
-    document.getElementById('last_power_off').innerHTML = '<strong>Останнє відключення</strong>: ' + data.last_power_off;
+    document.getElementById('status').innerHTML = '<strong>' + status_text + '</strong>: ' + data.interval;
+    document.getElementById('timestamp').innerHTML = '<strong>' + translation["time"] + '</strong>: ' + data.timestamp;
+    document.getElementById('current').innerHTML = '<strong>' + translation["current"] + '</strong>: ';
+    document.getElementById('prev').innerHTML = '<strong>' + translation["prev"] + '</strong>: ';
+    document.getElementById('interval').innerHTML = '<strong>' + last_status_text + '</strong>: ' + data.interval_previous;
+    document.getElementById('last_on').innerHTML = '<strong>' + translation["last_on"] + '</strong>: ' + data.last_on;
+    document.getElementById('last_off').innerHTML = '<strong>' + translation["last_off"] + '</strong>: ' + data.last_off;
     const img = document.getElementById('power_img');
-    img.src = data.power == "OK" ? '/static/img/power-on.png' : '/static/img/power-off.png';
+    img.src = data.status == "OK" ? '/static/img/power-on.png' : '/static/img/power-off.png';
 }
 
 setInterval(fetchData, 30000);  // Fetch data every 30 seconds

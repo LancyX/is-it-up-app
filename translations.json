@@ -1,0 +1,97 @@
+{
+    "ENGLISH": {
+        "time":{
+            "locale": "en_US.UTF-8",
+            "timezone": "UTC"
+        },
+
+        "time_diff": {
+            "years": "years",
+            "months": "months",
+            "days": "days",
+            "hours": "hours",
+            "minutes": "minutes"
+        },
+
+        "titles": {
+            "main": "Status Page",
+            "table": "Previous Data",
+            "contacts": "Contacts"
+        },
+
+        "main": {
+            "main": "Main",
+            "table": "Table",
+            "contacts": "Contacts",
+            "time": "Updated",
+            "current": "Current Data",
+            "status_on": "Is available throughout",
+            "status_off": "Is NOT available throughout",
+            "prev": "Previous Data",
+            "prev_status_on": "Was available throughout",
+            "prev_status_off": "Was NOT available throughout",
+            "last_on": "Previous UP",
+            "last_off": "Previous DOWN"
+        },
+
+        "table": {
+            "legend": "Legend",
+            "legend_on": "Available",
+            "legend_off": "NOT Available",
+            "interval_text": "amount of time",
+
+            "status": "Status",
+            "day": "Day",
+            "time": "Time of status",
+            "interval": "Interval"
+        }
+
+    },
+    "UKRAINIAN": {
+        "time":{
+            "locale": "uk_UA.UTF-8",
+            "timezone": "Europe/Kyiv"
+        },
+
+        "time_diff": {
+            "years": "років",
+            "months": "місяців",
+            "days": "днів",
+            "hours": "годин",
+            "minutes": "хвилин"
+        },
+
+        "titles": {
+            "main": "Статус",
+            "table": "Попередні дані",
+            "contacts": "Контакти"
+        },
+
+        "main": {
+            "main": "Головна",
+            "table": "Таблиця",
+            "contacts": "Контакти",
+            "time": "Дані оновлено",
+            "current": "Поточні дані",
+            "status_on": "Наявне впродовж",
+            "status_off": "Відсутнє впродовж",
+            "prev": "Попередні дані",
+            "prev_status_on": "Було наявне впродовж",
+            "prev_status_off": "Було відсутнє впродовж",
+            "last_on": "Попереднє включення",
+            "last_off": "Попереднє відключення"
+        },
+
+        "table": {
+            "legend": "Легенда",
+            "legend_on": "Наявнє",
+            "legend_off": "Відсутнє",
+            "interval_text": "скільки часу",
+
+            "status": "Статус",
+            "day": "День",
+            "time": "Час статусу",
+            "interval": "Проміжок"
+        }
+    }
+}

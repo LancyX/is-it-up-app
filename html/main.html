@@ -3,31 +3,31 @@
     <head>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>Power Status</title>
+        <title id="title">{title}</title>
         <link rel="stylesheet" type="text/css" href="/static/styles.css">
-        <script src="/static/scripts/main-fetch.js"></script>
+        <script type="module" src="/static/scripts/main-fetch.js"></script>
         <nav>
             <div class="menu-icon" onclick="toggleMenu()">☰</div>
             <ul id="nav-menu">
-              <li><a href="/">Головна</a></li>
-              <li><a href="/prev-data">Таблиця</a></li>
-              <li><a href="/contact">Контакти</a></li>
+              <li><a id="main" href="/">{main}</a></li>
+              <li><a id="table" href="/table">{table}</a></li>
+              <li><a id="contacts" href="/contact">{contacts}</a></li>
             </ul>
         </nav>
     </head>
     <script src="/static/scripts/nagivation.js"></script>
     <body>
         <div class="container">
-            <h2>м. Вишневе</h2>
-            <h2>вул. Машинобудівників, буд. 23</h2>
+            <h2 id="title_1">{title_1}</h2>
+            <h2 id="title_2">{title_2}</h2>
             <img id="power_img" src="/static/img/power-off.png" alt="Power Status">
-            <h3><strong>Поточні дані</strong>:</h3>
-            <p id="power"><strong>Електропостачання</strong>: </p>
-            <p id="timestamp"><strong>Дані оновлено</strong>: </p>
-            <h3><strong>Попередні дані</strong>:</h3>
+            <h3 id="current"><strong>{current}</strong>:</h3>
+            <p id="status"><strong>{status}</strong>: </p>
+            <p id="timestamp"><strong>{time}</strong>: </p>
+            <h3 id="prev"><strong>{prev}</strong>:</h3>
             <p id="interval"><strong>|</strong></p>
-            <p id="last_power_on"><strong>Останнє включення</strong>: </p>
-            <p id="last_power_off"><strong>Останнє відключення</strong>: </p>
+            <p id="last_on"><strong>{last_on}</strong>: </p>
+            <p id="last_off"><strong>{last_off}</strong>: </p>
         </div>
     </body>
     </html>

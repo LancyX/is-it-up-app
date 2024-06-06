@@ -1,48 +1,52 @@
 """Basic functions for appd"""
 import os
 import socket
+import locale
 from datetime import datetime
 import pytz
 from db import Database
+from translation import read_translation
+
+FORMAT_STR = "%Y-%m-%d %H:%M"
+LANGUAGE = os.getenv('LANGUAGE')
 
 async def get_all_status():
     """return all data from table"""
     db = Database()
-    result = db.get_all(table="power_status")
+    result = await db.get_all(table="power_status")
     return result
 
 async def get_last_status():
     """return most recent data from table"""
     db = Database()
-    result = db.get_last(table="power_status")
+    result = await db.get_last(table="power_status")
     return result
 
 async def get_prev_status():
     """return previous status data from table"""
     db = Database()
-    result = db.get_prev(table="power_status")
+    result = await db.get_prev(table="power_status")
     return result
 
 async def update_status(metric: str,
                         value: str):
     """update values in rows"""
     db = Database()
-    db.update_status(table="power_status",
-                     metric=metric,
-                     value=value)
+    await db.update_status(table="power_status",
+                           metric=metric,
+                           value=value)
 
 async def insert_new_status(data: dict):
     """insert new row"""
     db = Database()
-    db.insert_status_row(table="power_status",
-                         data=data)
+    await db.insert_status_row(table="power_status",
+                               data=data)
 
 async def get_interval(t1: str,
                        t2: str):
     """return diff between 2 given timestamps"""
-    format_str = "%Y-%m-%d %H:%M"
-    dt1 = datetime.strptime(t1, format_str)
-    dt2 = datetime.strptime(t2, format_str)
+    dt1 = datetime.strptime(t1, FORMAT_STR)
+    dt2 = datetime.strptime(t2, FORMAT_STR)
 
     if dt1 > dt2:
         time_diff = dt1 - dt2
@@ -55,26 +59,48 @@ async def get_interval(t1: str,
     hours = abs(time_diff.seconds // 3600)
     minutes = abs((time_diff.seconds % 3600) // 60)
 
+    data = await read_translation(language=LANGUAGE)
+    diff_text = data["time_diff"]
+
     # Format the difference
     formatted_diff = ""
     if years:
-        formatted_diff += f"{years} років, "
+        formatted_diff += f"{years} {diff_text['years']}, "
     if months:
-        formatted_diff += f"{months} місяців, "
+        formatted_diff += f"{months} {diff_text['months']}, "
     if days:
-        formatted_diff += f"{days} днів, "
+        formatted_diff += f"{days} {diff_text['days']}, "
     if hours:
-        formatted_diff += f"{hours} годин, "
+        formatted_diff += f"{hours} {diff_text['hours']}, "
     if minutes:
-        formatted_diff += f"{minutes} хвилин, "
+        formatted_diff += f"{minutes} {diff_text['minutes']}, "
 
     interval = formatted_diff.strip(", ")
     return interval
 
+async def get_time():
+    """return timestamp for updating rows"""
+    data = await read_translation(language=LANGUAGE)
+    data = data["time"]
+    locale.setlocale(locale.LC_TIME, data["locale"])
+    if data["timezone"] == "UTC":
+        now = datetime.now(pytz.utc)
+    else:
+        now = datetime.now(pytz.timezone(data["timezone"]))
+    return now
+
+async def get_day_of_week(now: object):
+    """return day of week, starting with capital letter"""
+    day_name = now.strftime("%A")
+    day_name_tittle = day_name.title()
+    return day_name_tittle
+
 async def crontask():
     """main task which checks telnet connection and updates statuses"""
-    now = datetime.now(pytz.timezone('Europe/Kyiv'))
-    timestamp = now.strftime("%Y-%m-%d %H:%M")
+    now = await get_time()
+    timestamp = now.strftime(FORMAT_STR)
+
+    day_of_week = await get_day_of_week(now=now)
 
     status_data = await get_last_status()
     known_status = status_data["status"]
@@ -88,22 +114,23 @@ async def crontask():
         interval = await get_interval(t1=timestamp,
                                       t2=status_data["inserted"])
 
-    elif known_status != power and power == "OK":
-        interval = "0 хвилин"
-    elif known_status != power and power == "ERR":
-        interval = "0 хвилин"
+    elif known_status != power:
+        interval = "0" + await read_translation(language=LANGUAGE)['time_diff']['minutes']
 
     if known_status == power:
         await update_status(metric="updated", value=timestamp)
         await update_status(metric="interval", value=interval)
         await update_status(metric="interval_previous", value=interval_previous)
+        await update_status(metric="day_of_week", value=day_of_week)
+
     else:
         data = {
                 "status": power,
                 "updated": timestamp,
                 "interval": interval,
                 "interval_previous": interval_previous,
-                "inserted": timestamp
+                "inserted": timestamp,
+                "day_of_week": day_of_week
                 }
 
         await insert_new_status(data=data)
@@ -113,8 +140,8 @@ async def telnet():
     Check if a specific port on a host is open.
     Returns OK if the port is open, ERR otherwise.
     """
-    host = os.getenv("HOME_HOST")
-    port = int(os.getenv("HOME_PORT"))
+    host = os.getenv("CHECK_HOST")
+    port = int(os.getenv("CHECK_PORT"))
     timeout = 5
 
     try:
