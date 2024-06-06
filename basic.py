@@ -120,7 +120,9 @@ async def crontask():
                                       t2=status_data["inserted"])
 
     elif known_status != power:
-        interval = "0" + await read_translation(language=LANGUAGE)['time_diff']['minutes']
+        translation = await read_translation(language=LANGUAGE)
+        interval = translation['time_diff']['minutes']
+        interval = "0" + interval
 
     if known_status == power:
         await update_status(metric="updated", value=timestamp)
