@@ -189,3 +189,21 @@ nav {
   .show-menu #nav-menu {
     display: block;
   }
+
+button {
+  margin-bottom: 20px;
+  padding: 10px 15px;
+  background-color: white;
+  color: black;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+button:hover {
+    background-color: white;
+}
+
+.toggle-column {
+  display: none;
+}

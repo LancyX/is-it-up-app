@@ -1,6 +1,7 @@
 import fetchTitles from '/static/scripts/titles.js';
 import fetchNav from '/static/scripts/nav.js';
 import fetchTranslation from '/static/scripts/translations.js';
+// import buttonStatus from '/static/scripts/table-toggle.js';
 
 async function fetchData() {
     await fetchTitles()
@@ -27,9 +28,11 @@ async function fetchData() {
         '<a class="status-err"><strong>' + translation.legend_off + '</strong></a>';
 
     document.getElementById('status').innerHTML = '<th>' + translation.status + '</th>';
-    document.getElementById('day').innerHTML = '<th>' + translation.day + '</th>';
+    document.getElementById('day').innerHTML = '<th class="toggle-column">' + translation.day + '</th>';
     document.getElementById('time').innerHTML = '<th>' + translation.time + '</th>';
     document.getElementById('interval').innerHTML = '<th>' + translation.interval + '</th>';
+
+    document.getElementById('toggleColumn').textContent = translation["button_day"];
 
     let status_value;
     let status_text;
@@ -46,7 +49,7 @@ async function fetchData() {
             const row = document.createElement('tr');
             row.innerHTML = `
                 <td>${status_text}</td>
-                <td>${item.day_of_week}</td>
+                <td class="toggle-column">${item.day_of_week}</td>
                 <td>${item.inserted}</td>
                 <td>${item.interval}</td>
             `;
@@ -54,5 +57,12 @@ async function fetchData() {
             tbody.appendChild(row);
         })
     }
+
+function toggleColumn() {
+    const columns = document.querySelectorAll('.toggle-column');
+    columns.forEach(column => {
+        column.style.display = (column.style.display === 'none') ? '' : 'none';
+    });
+}
 
 window.onload = fetchData;

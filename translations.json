@@ -43,7 +43,8 @@
             "status": "Status",
             "day": "Day",
             "time": "Time of status",
-            "interval": "Interval"
+            "interval": "Interval",
+            "button_day": "Show/Hide day of week"
         }
 
     },
@@ -91,7 +92,8 @@
             "status": "Статус",
             "day": "День",
             "time": "Час статусу",
-            "interval": "Проміжок"
+            "interval": "Проміжок",
+            "button_day": "Показати/Cховати день тижня"
         }
     }
 }

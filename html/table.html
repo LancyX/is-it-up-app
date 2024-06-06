@@ -3,38 +3,39 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title id="title">Table</title>
+<title id="title"></title>
 <link rel="stylesheet" type="text/css" href="/static/styles.css">
 <script type="module" src="/static/scripts/table-fetch.js"></script>
 <nav>
     <div class="menu-icon" onclick="toggleMenu()">☰</div>
     <ul id="nav-menu">
-        <li><a id="main" href="/">{main}</a></li>
-        <li><a id="table" href="/table">{table}</a></li>
-        <li><a id="contacts" href="/contact">{contacts}</a></li>
+        <li><a id="main" href="/"></a></li>
+        <li><a id="table" href="/table"></a></li>
+        <li><a id="contacts" href="/contact"></a></li>
     </ul>
 </nav>
 <script src="/static/scripts/nagivation.js"></script>
 </head>
 <body>
-    <h2 id="title_1">{title_1}</h2>
-    <h2 id="title_2">{title_2}</h2>
+    <h2 id="title_1"></h2>
+    <h2 id="title_2"></h2>
     <div class="legend">
-        <h3 id="legend">{}</h3>
+        <h3 id="legend"></h3>
         <ul>
             <li id="text" class="text">
-                <strong>{}</strong> - {} <a class="status-ok"><strong>{}</strong></a> чи <a class="status-err"><strong>{}</strong></a>
+                <strong></strong><a class="status-ok"><strong></strong></a><a class="status-err"><strong></strong></a>
             </li>
         </ul>
     </div>
-
+<script src="/static/scripts/table-toggle.js"></script>
+<button id="toggleColumn" onclick="toggleColumn()"></button>
 <table id="dataTable">
     <thead>
         <tr>
-            <th id="status">{}</th>
-            <th id="day">{}</th>
-            <th id="time">{}</th>
-            <th id="interval">{}</th>
+            <th id="status"></th>
+            <th class="toggle-column" id="day"></th>
+            <th id="time"></th>
+            <th id="interval"></th>
         </tr>
     </thead>
     <tbody>
