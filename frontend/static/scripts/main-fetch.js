@@ -17,10 +17,10 @@ async function fetchData() {
 
     if (data.status == "OK") {
         status_text = translation.status_on
-        last_status_text = translation.prev_status_on
+        last_status_text = translation.prev_status_off
     } else {
         status_text = translation.status_off
-        last_status_text = translation.prev_status_off
+        last_status_text = translation.prev_status_on
     }
 
     document.getElementById('status').innerHTML = '<strong>' + status_text + '</strong>: ' + data.interval;
