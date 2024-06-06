@@ -16,7 +16,8 @@
         "titles": {
             "main": "Status Page",
             "table": "Previous Data",
-            "contacts": "Contacts"
+            "contacts": "Contacts",
+            "maintenance" : "Maintenance"
         },
 
         "main": {
@@ -45,6 +46,11 @@
             "time": "Time of status",
             "interval": "Interval",
             "button_day": "Show/Hide day of week"
+        },
+
+        "maintenance": {
+            "title": "Maintenance",
+            "text": "The service is currently undergoing maintenance. It will be available again once the maintenance is completed"
         }
 
     },
@@ -65,7 +71,8 @@
         "titles": {
             "main": "Статус",
             "table": "Попередні дані",
-            "contacts": "Контакти"
+            "contacts": "Контакти",
+            "maintenance" : "Обслуговування"
         },
 
         "main": {
@@ -94,6 +101,11 @@
             "time": "Час статусу",
             "interval": "Проміжок",
             "button_day": "Показати/Cховати день тижня"
+        },
+
+        "maintenance": {
+            "title": "Обслуговування",
+            "text": "Наразі сервіс обслуговується. По закінченню - знову буде доступний"
         }
     }
 }

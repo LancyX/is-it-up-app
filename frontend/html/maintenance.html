@@ -1,16 +1,17 @@
 <!DOCTYPE html>
-    <html lang="ua">
+    <html>
     <head>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>Power Status</title>
+        <script type="module" src="/static/scripts/maintenance.js"></script>
+        <title id="title"></title>
         <link rel="stylesheet" type="text/css" href="/static/styles.css">
     </head>
     <body>
         <div class="container">
-            <h2>Обслуговування</h2>
-            <img id="power_img" src="/static/img/maintenance.png" alt="Power Status">
-            <p><strong>Наразі обслуговую сервіс. По закінченню - знову буде відкриватись сайт</strong></p>
+            <h2 id="title_small"></h2>
+            <img id="power_img" src="/static/img/maintenance.png">
+            <p id="text"><strong></strong></p>
         </div>
     </body>
     </html>
