@@ -10,6 +10,11 @@ from translation import read_translation
 FORMAT_STR = "%Y-%m-%d %H:%M"
 LANGUAGE = os.getenv('LANGUAGE')
 
+def get_mode():
+    """return mode value"""
+    data = os.getenv('MODE')
+    return data
+
 async def get_all_status():
     """return all data from table"""
     db = Database()

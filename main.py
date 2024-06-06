@@ -1,9 +1,12 @@
 from contextlib import asynccontextmanager
 from fastapi import FastAPI
+import uvicorn
 from fastapi.responses import HTMLResponse
 from fastapi.staticfiles import StaticFiles
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
-from basic import crontask, get_all_status, get_last_status, get_prev_status, read_html, LANGUAGE
+from basic import crontask, get_all_status, get_last_status
+from basic import get_prev_status, read_html, get_mode
+from basic import LANGUAGE
 from translation import read_translation, read_titles
 from models import Translation
 
@@ -11,25 +14,24 @@ app = FastAPI()
 
 app.mount("/static", StaticFiles(directory="static"), name="static")
 
-# Initialize the scheduler
 scheduler = AsyncIOScheduler()
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     """Set up rate limiting"""
-
     # Start the scheduler
     scheduler.start()
-
     # Yield control to the application
     yield
-
     # Clean up resources on shutdown
     scheduler.shutdown()
 
 app.router.lifespan_context = lifespan
 
-scheduler.add_job(crontask, 'interval', seconds=30)
+MODE = get_mode()
+
+if MODE != "MAINTENANCE":
+    scheduler.add_job(crontask, 'interval', seconds=30)
 
 # API DATA Section
 
@@ -87,27 +89,40 @@ async def get_titles():
 @app.get("/", response_class=HTMLResponse)
 async def read_root():
     """return main.html with root page"""
-    html_content = await read_html(source="main")
-    # html_content = await read_html(source="maintenance")
+    print (MODE)
+    if MODE != "MAINTENANCE":
+        html_content = await read_html(source="main")
+    else:
+        html_content = await read_html(source="maintenance")
     return HTMLResponse(content=html_content)
 
 @app.get("/table", response_class=HTMLResponse)
 async def read_table():
     """return main.html with root page"""
-    html_content = await read_html(source="table")
+    if MODE != "MAINTENANCE":
+        html_content = await read_html(source="table")
+    else:
+        html_content = await read_html(source="maintenance")
     return HTMLResponse(content=html_content)
 
 @app.get("/prev-data", response_class=HTMLResponse)
 async def read_prev_data():
     """return main.html with root page"""
-    html_content = await read_html(source="table")
+    if MODE != "MAINTENANCE":
+        html_content = await read_html(source="table")
+    else:
+        html_content = await read_html(source="maintenance")
     return HTMLResponse(content=html_content)
 
 @app.get("/contact", response_class=HTMLResponse)
 async def read_contact():
     """return main.html with root page"""
-    html_content = await read_html(source="contact")
+    if MODE != "MAINTENANCE":
+        html_content = await read_html(source="contact")
+    else:
+        html_content = await read_html(source="maintenance")
     return HTMLResponse(content=html_content)
+
 
 if __name__ == "__main__":
     import uvicorn
