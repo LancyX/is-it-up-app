@@ -169,7 +169,7 @@ static/.DS_Store
 static/img/.DS_Store
 
 # sqlite database
-*.db
+monitor.db
 
 # test script
 test.py

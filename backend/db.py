@@ -10,14 +10,54 @@ class Database():
         """
         connect to db
         """
-        connection = sqlite3.connect('../home_monitor.db')
+        connection = sqlite3.connect('monitor.db')
         connection.row_factory = sqlite3.Row
         return connection
+
+    async def create_table_if_not_exist(self):
+        """
+        create table if not present
+        """
+        connection = await self.connect()
+        cur = connection.cursor()
+        cur.execute('''SELECT name FROM sqlite_master WHERE type='table'
+                    AND name="power_status";''')
+        exist = cur.fetchone()
+
+        if not exist:
+            table_schema = """
+                            id INTEGER PRIMARY KEY,
+                            status TEXT,
+                            inserted TIMESTAMP,
+                            day_of_week TEXT,
+                            updated TIMESTAMP,
+                            interval TEXT,
+                            interval_previous TEXT
+                            """
+            cur.execute(f"CREATE TABLE IF NOT EXISTS power_status ({table_schema})")
+            connection.commit()
+
+            cur.execute('''INSERT INTO power_status (id,status,inserted,day_of_week,
+                        updated, interval,interval_previous)
+                        VALUES( "1","ERR","2024-06-06 16:25","Thursday",
+                        "2024-06-06 19:24","1 hour","5 minutes");''')
+            connection.commit()
+
+            cur.execute('''INSERT INTO power_status (id,status,inserted,day_of_week,
+                        updated, interval,interval_previous)
+                        VALUES( "2","OK","2024-06-06 19:25","Thursday",
+                        "2024-06-06 19:25","0 minutes","1 hour");''')
+            connection.commit()
+
+            cur.close()
+            connection.close()
 
     async def get_all(self, table: str):
         """
         getting all rows from table
         """
+        await self.create_table_if_not_exist()
+
         connection = await self.connect()
         cur = connection.cursor()
         cur.execute(f'''SELECT status, inserted, interval, day_of_week
@@ -30,6 +70,8 @@ class Database():
         """
         getting last row from table
         """
+        await self.create_table_if_not_exist()
+
         connection = await self.connect()
         cur = connection.cursor()
         cur.execute(f'''SELECT * FROM {table} WHERE inserted > datetime("now", "-7 days")
@@ -42,6 +84,8 @@ class Database():
         """
         getting all rows from table
         """
+        await self.create_table_if_not_exist()
+
         connection = await self.connect()
         cur = connection.cursor()
         cur.execute(f'''SELECT * FROM {table} WHERE inserted > datetime("now", "-7 days")
@@ -55,6 +99,8 @@ class Database():
         """
         update status in rows
         """
+        await self.create_table_if_not_exist()
+
         connection = await self.connect()
         cur = connection.cursor()
 
@@ -68,6 +114,8 @@ class Database():
         """
         update status in rows
         """
+        await self.create_table_if_not_exist()
+
         connection = await self.connect()
         cur = connection.cursor()
 

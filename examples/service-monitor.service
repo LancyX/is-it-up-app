@@ -1,0 +1,25 @@
+# Location of service file:
+#   /etc/systemd/system/service-monitor.service
+
+# To enable service:
+#   systemctl deamon-reload
+#   systemctl enable service-monitor.service
+#   systemctl start service-monitor.service
+
+[Unit]
+Description=Power Status
+After=network.target
+
+[Service]
+Environment="CHECK_HOST=<host>"
+Environment="CHECK_PORT=<port>"
+
+Environment="LANGUAGE=ENGLISH"
+
+User=<user>
+WorkingDirectory=<path to repository>
+ExecStart=/usr/bin/bash <path to repository>/tools/run.sh
+Restart=always
+
+[Install]
+WantedBy=multi-user.target
