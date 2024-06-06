@@ -10,7 +10,7 @@ class Database():
         """
         connect to db
         """
-        connection = sqlite3.connect('home_monitor.db')
+        connection = sqlite3.connect('../home_monitor.db')
         connection.row_factory = sqlite3.Row
         return connection
 

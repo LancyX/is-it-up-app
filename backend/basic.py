@@ -122,7 +122,7 @@ async def crontask():
     elif known_status != power:
         translation = await read_translation(language=LANGUAGE)
         interval = translation['time_diff']['minutes']
-        interval = "0" + interval
+        interval = "0 " + interval
 
     if known_status == power:
         await update_status(metric="updated", value=timestamp)
@@ -165,6 +165,6 @@ async def telnet():
 
 async def read_html(source: str):
     """return desired html page content"""
-    with open(f"html/{source}.html", "r", encoding="utf-8") as file:
+    with open(f"../frontend/html/{source}.html", "r", encoding="utf-8") as file:
         # Reading from a file
         return file.read()

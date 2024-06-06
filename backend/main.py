@@ -12,7 +12,7 @@ from models import Translation
 
 app = FastAPI()
 
-app.mount("/static", StaticFiles(directory="static"), name="static")
+app.mount("/static", StaticFiles(directory="../frontend/static"), name="static")
 
 scheduler = AsyncIOScheduler()
 
@@ -105,15 +105,6 @@ async def read_table():
         html_content = await read_html(source="maintenance")
     return HTMLResponse(content=html_content)
 
-@app.get("/prev-data", response_class=HTMLResponse)
-async def read_prev_data():
-    """return main.html with root page"""
-    if MODE != "MAINTENANCE":
-        html_content = await read_html(source="table")
-    else:
-        html_content = await read_html(source="maintenance")
-    return HTMLResponse(content=html_content)
-
 @app.get("/contact", response_class=HTMLResponse)
 async def read_contact():
     """return main.html with root page"""
@@ -125,5 +116,4 @@ async def read_contact():
 
 
 if __name__ == "__main__":
-    import uvicorn
-    uvicorn.run(app, host="127.0.0.1", port=8000)
+    uvicorn.run(app, host="0.0.0.0", port=8000)
