@@ -1,4 +1,4 @@
 #!/bin/bash
 export MODE="MAINTENANCE"
 
-sh run.sh
+sh tools/run.sh
