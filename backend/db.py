@@ -1,27 +1,24 @@
 """Iteraction with sqlite database"""
+
 import sqlite3
 
-class Database():
-    """
-    db interaction
-    """
 
-    async def connect(self):
-        """
-        connect to db
-        """
-        connection = sqlite3.connect('monitor.db')
+class Database:
+    """DB interaction"""
+
+    @staticmethod
+    async def connect():
+        """Connect to db"""
+        connection = sqlite3.connect("monitor.db")
         connection.row_factory = sqlite3.Row
         return connection
 
     async def create_table_if_not_exist(self):
-        """
-        create table if not present
-        """
+        """Create table if not present"""
         connection = await self.connect()
         cur = connection.cursor()
-        cur.execute('''SELECT name FROM sqlite_master WHERE type='table'
-                    AND name="power_status";''')
+        cur.execute("""SELECT name FROM sqlite_master WHERE type='table'
+                    AND name="power_status";""")
         exist = cur.fetchone()
 
         if not exist:
@@ -37,91 +34,80 @@ class Database():
             cur.execute(f"CREATE TABLE IF NOT EXISTS power_status ({table_schema})")
             connection.commit()
 
-            cur.execute('''INSERT INTO power_status (id,status,inserted,day_of_week,
+            cur.execute("""INSERT INTO power_status (id,status,inserted,day_of_week,
                         updated, interval,interval_previous)
                         VALUES( "1","ERR","2024-06-06 16:25","Thursday",
-                        "2024-06-06 19:24","1 hour","5 minutes");''')
+                        "2024-06-06 19:24","1 hour","5 minutes");""")
             connection.commit()
 
-            cur.execute('''INSERT INTO power_status (id,status,inserted,day_of_week,
+            cur.execute("""INSERT INTO power_status (id,status,inserted,day_of_week,
                         updated, interval,interval_previous)
                         VALUES( "2","OK","2024-06-06 19:25","Thursday",
-                        "2024-06-06 19:25","0 minutes","1 hour");''')
+                        "2024-06-06 19:25","0 minutes","1 hour");""")
             connection.commit()
 
             cur.close()
             connection.close()
 
     async def get_all(self, table: str):
-        """
-        getting all rows from table
-        """
+        """Get all rows from table"""
         await self.create_table_if_not_exist()
 
         connection = await self.connect()
         cur = connection.cursor()
-        cur.execute(f'''SELECT status, inserted, interval, day_of_week
-                    FROM {table} WHERE inserted > datetime("now", "-7 days") ORDER BY id DESC''')
+        cur.execute(f"""SELECT status, inserted, interval, day_of_week
+                    FROM {table} WHERE inserted > datetime("now", "-7 days")
+                      ORDER BY id DESC""")
         rows = cur.fetchall()
-        result = [{k: row[k] for k in row.keys()} for row in rows]
-        return result
+        return [dict(row) for row in rows]
 
     async def get_last(self, table: str):
-        """
-        getting last row from table
-        """
+        """Get last row from table"""
         await self.create_table_if_not_exist()
 
         connection = await self.connect()
         cur = connection.cursor()
-        cur.execute(f'''SELECT * FROM {table} WHERE inserted > datetime("now", "-7 days")
-                    AND id = (SELECT MAX(id) FROM {table})''')
+        cur.execute(f"""SELECT * FROM {table} WHERE inserted > datetime("now", "-7 days")
+                    AND id = (SELECT MAX(id) FROM {table})""")
         rows = cur.fetchall()
-        result = [{k: row[k] for k in row.keys()} for row in rows]
+        result = [dict(row) for row in rows]
+
         return result[0]
 
     async def get_prev(self, table: str):
-        """
-        getting all rows from table
-        """
+        """Get all rows from table"""
         await self.create_table_if_not_exist()
 
         connection = await self.connect()
         cur = connection.cursor()
-        cur.execute(f'''SELECT * FROM {table} WHERE inserted > datetime("now", "-7 days")
-                    AND id = (SELECT MAX(id) FROM {table}) - 1''')
+        cur.execute(f"""SELECT * FROM {table} WHERE inserted > datetime("now", "-7 days")
+                    AND id = (SELECT MAX(id) FROM {table}) - 1""")
         rows = cur.fetchall()
-        result = [{k: row[k] for k in row.keys()} for row in rows]
+        result = [dict(row) for row in rows]
         return result[0]
 
-    async def update_status(self, table: str,
-                      metric: str, value: str):
-        """
-        update status in rows
-        """
+    async def update_status(self, table: str, metric: str, value: str):
+        """Update status in rows"""
         await self.create_table_if_not_exist()
 
         connection = await self.connect()
         cur = connection.cursor()
 
         # Update the row with the new values, except for the id
-        cur.execute(f'''UPDATE {table} SET {metric} = "{value}"
-                    WHERE id = (SELECT MAX(id) FROM {table})''')
+        cur.execute(f"""UPDATE {table} SET {metric} = "{value}"
+                    WHERE id = (SELECT MAX(id) FROM {table})""")
         connection.commit()
 
-    async def insert_status_row(self, table: str,
-                          data: dict):
-        """
-        update status in rows
-        """
+    async def insert_status_row(self, table: str, data: dict):
+        """Update status in rows"""
         await self.create_table_if_not_exist()
 
         connection = await self.connect()
         cur = connection.cursor()
 
-        cur.execute(f'''INSERT INTO {table}
+        cur.execute(f"""INSERT INTO {table}
                     (status, updated, interval, interval_previous, inserted, day_of_week)
                     VALUES ("{data["status"]}", "{data["updated"]}", "{data["interval"]}",
                     "{data["interval_previous"]}", "{data["inserted"]}",
-                    "{data["day_of_week"]}" )''')
+                    "{data["day_of_week"]}" )""")
         connection.commit()

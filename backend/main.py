@@ -6,8 +6,8 @@ from fastapi.staticfiles import StaticFiles
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
 from basic import crontask, get_all_status, get_last_status
 from basic import get_prev_status, read_html, get_mode
+from basic import read_translation, read_titles
 from basic import LANGUAGE
-from translation import read_translation, read_titles
 from models import Translation
 
 app = FastAPI()
@@ -16,28 +16,32 @@ app.mount("/static", StaticFiles(directory="../frontend/static"), name="static")
 
 scheduler = AsyncIOScheduler()
 
+
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     """Set up rate limiting"""
     # Start the scheduler
+    print(app)
     scheduler.start()
     # Yield control to the application
     yield
     # Clean up resources on shutdown
     scheduler.shutdown()
 
+
 app.router.lifespan_context = lifespan
 
 MODE = get_mode()
 
 if MODE != "MAINTENANCE":
-    scheduler.add_job(crontask, 'interval', seconds=30)
+    scheduler.add_job(crontask, "interval", seconds=30)
 
 # API DATA Section
 
+
 @app.get("/api/main")
 async def get_data():
-    """return json with data for frontend"""
+    """Return json with data for frontend"""
     status = await get_last_status()
     prev_status = await get_prev_status()
     power = status["status"]
@@ -52,62 +56,64 @@ async def get_data():
         last_power_on = prev_status["inserted"]
         last_power_off = status["inserted"]
 
-    data = {
-            "status": power,
-            "timestamp": updated,
-            "last_on": last_power_on,
-            "last_off": last_power_off,
-            "interval_previous": interval_previous,
-            "interval": interval
-            }
+    return {
+        "status": power,
+        "timestamp": updated,
+        "last_on": last_power_on,
+        "last_off": last_power_off,
+        "interval_previous": interval_previous,
+        "interval": interval,
+    }
 
-    return data
 
 @app.get("/api/table")
 async def get_prev_data_table():
-    """return json with data for frontend"""
-    data = await get_all_status()
-    return data
+    """Return json with data for frontend"""
+    return await get_all_status()
+
 
 # API Translation Section
 
+
 @app.post("/api/translation")
 async def get_translation(request: Translation):
-    """return json with translation data for frontend"""
+    """Return json with translation data for frontend"""
     data = await read_translation(language=LANGUAGE)
-    data = data[request.page]
-    return data
+    return data[request.page]
+
 
 @app.get("/api/titles")
 async def get_titles():
-    """return json with titles data for frontend"""
-    data = await read_titles()
-    return data
+    """Return json with titles data for frontend"""
+    return await read_titles()
+
 
 # HTML Section
 
+
 @app.get("/", response_class=HTMLResponse)
 async def read_root():
-    """return main.html with root page"""
-    print (MODE)
+    """Return main.html with root page"""
     if MODE != "MAINTENANCE":
         html_content = await read_html(source="main")
     else:
         html_content = await read_html(source="maintenance")
     return HTMLResponse(content=html_content)
 
+
 @app.get("/table", response_class=HTMLResponse)
 async def read_table():
-    """return main.html with root page"""
+    """Return main.html with root page"""
     if MODE != "MAINTENANCE":
         html_content = await read_html(source="table")
     else:
         html_content = await read_html(source="maintenance")
     return HTMLResponse(content=html_content)
 
+
 @app.get("/contact", response_class=HTMLResponse)
 async def read_contact():
-    """return main.html with root page"""
+    """Return main.html with root page"""
     if MODE != "MAINTENANCE":
         html_content = await read_html(source="contact")
     else:
@@ -116,4 +122,4 @@ async def read_contact():
 
 
 if __name__ == "__main__":
-    uvicorn.run(app, host="0.0.0.0", port=8000)
+    uvicorn.run(app, host="127.0.0.1", port=8000)  # type: ignore[S104]

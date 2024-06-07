@@ -3,3 +3,8 @@ fastapi==0.111.0
 pydantic==1.10.7
 pytz==2023.3
 uvicorn==0.30.1
+pre-commit
+mypy
+ruff
+aiofiles
+pathlib

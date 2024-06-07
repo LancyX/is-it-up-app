@@ -8,4 +8,4 @@ start-python:
 	sh tools/run.sh
 
 start-python-maintenance:
-	sh tooks/run-maintenance.sh
+	sh tools/run-maintenance.sh

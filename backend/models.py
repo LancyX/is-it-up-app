@@ -1,5 +1,7 @@
 from pydantic import BaseModel
 
+
 class Translation(BaseModel):
-    """request format"""
+    """Request format"""
+
     page: str
