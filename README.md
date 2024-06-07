@@ -1,5 +1,5 @@
 
-# is-it-up-app [ˈɪz ɪt ˈʌp æp]
+# is-it-up-app [ˈɪz ɪt ˈʌp ˈʌp]
 
 
 
