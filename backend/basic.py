@@ -97,7 +97,7 @@ async def get_time():
 async def get_day_of_week(now: object):
     """return day of week, starting with capital letter"""
     day_name = now.strftime("%A")
-    day_name_tittle = day_name.title()
+    day_name_tittle = ' '.join(word.capitalize() for word in day_name.split(" "))
     return day_name_tittle
 
 async def crontask():
