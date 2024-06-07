@@ -128,7 +128,6 @@ async def crontask():
         await update_status(metric="updated", value=timestamp)
         await update_status(metric="interval", value=interval)
         await update_status(metric="interval_previous", value=interval_previous)
-        await update_status(metric="day_of_week", value=day_of_week)
 
     else:
         data = {
