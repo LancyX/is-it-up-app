@@ -177,5 +177,4 @@ async def read_translation(language):
 
 async def read_titles():
     """Return translation data for desired language"""
-    file_content = Path("../translations/titles.json").read_text(encoding="utf-8")
-    return json.loads(file_content)
+    return {"title_1": os.getenv("TITLE_1"), "title_2": os.getenv("TITLE_2")}

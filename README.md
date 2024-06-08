@@ -18,22 +18,49 @@ To run this project, you will need theese Environment Variables in **docker-comp
 * `CHECK_HOST` - **host** or **ip** to service
 * `CHECK_PORT` - **port** to service
 * `LANGUAGE` - **ENGLISH** or **UKRAINIAN**
+* `TITLE_1` - first **title** line
+* `TITLE_2` - second **title** line
 [**Optional**]:
 * `MODE` - if set **MAINTENANCE** all routes will respond with maintenance page
 
 
+## Run localy
 
-## Configuration
+[**Using docker run**]:
 
-In addition to **environment variables**, a JSON file called '**translations/titles.json**' is used:
-
-```json
-{
-    "title_1": "Monitoring Page",
-    "title_2": "Update title in translations/titles.json"
-}
+```bash
+  docker run -d \
+    --name is-it-up-app \
+    -p 8000:8000 \
+    -e CHECK_HOST=<host> \
+    -e CHECK_PORT=<port> \
+    -e LANGUAGE=ENGLISH \
+    -e TITLE_1=Monitoring \
+    -e TITLE_2=Here is your service \
+    -v sqlite:/app/backend/ \
+    --restart unless-stopped \
+    lancyx/is-it-up-app:latest
 ```
-## Run Locally
+
+[**Using docker-compose**]:
+
+1. Download examples/docker-compose.yaml
+
+2. Navigate to directory with docker-compose.yaml
+
+3. Start app:
+
+```bash
+  docker compose up -d
+```
+
+or
+
+```bash
+  docker-compose up -d
+```
+
+## Run Locally from source
 
 Clone the project
 

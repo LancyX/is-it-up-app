@@ -3,10 +3,7 @@ version: '3'
 services:
   app:
     container_name: is-it-up-app
-    image: is-it-up-app
-    build:
-      context: .
-      dockerfile: Dockerfile
+    image: lancyx/is-it-up-app:latest
     restart: unless-stopped
     ports:
       - "8000:8000"
@@ -27,4 +24,6 @@ services:
       - TITLE_1=Monitoring
       - TITLE_2=Here is your service
     volumes:
-      - .:/app:delegated
+      - sqlite:/app/backend/
+volumes:
+  sqlite:
