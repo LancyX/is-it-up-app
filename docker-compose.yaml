@@ -1,4 +1,4 @@
-version: '3'
+version: "3"
 
 services:
   app:
@@ -12,19 +12,22 @@ services:
       - "8000:8000"
     environment:
       # host of service to check
-      - CHECK_HOST=<host>
+      CHECK_HOST: host
 
       # port of service to check
-      - CHECK_PORT=<port>
+      CHECK_PORT: port
 
       # Available languages - in translations.json
-      - LANGUAGE=ENGLISH
+      LANGUAGE: ENGLISH
 
       # For maintenance purposes
-      # - MODE=MAINTENANCE
+      # MODE=MAINTENANCE
 
       # titles for main and table pages
-      - TITLE_1=Monitoring
-      - TITLE_2=Here is your service
+      TITLE_1: Monitoring
+      TITLE_2: Here is your service
     volumes:
-      - .:/app:delegated
+      - is-it-up-app:/app/db
+
+volumes:
+  is-it-up-app:

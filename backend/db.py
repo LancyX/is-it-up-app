@@ -9,7 +9,7 @@ class Database:
     @staticmethod
     async def connect():
         """Connect to db"""
-        connection = sqlite3.connect("monitor.db")
+        connection = sqlite3.connect("../db/monitor.db")
         connection.row_factory = sqlite3.Row
         return connection
 
@@ -56,8 +56,7 @@ class Database:
         connection = await self.connect()
         cur = connection.cursor()
         cur.execute(f"""SELECT status, inserted, interval, day_of_week
-                    FROM {table} WHERE inserted > datetime("now", "-7 days")
-                      ORDER BY id DESC""")
+                    FROM {table} ORDER BY id DESC""")
         rows = cur.fetchall()
         return [dict(row) for row in rows]
 
@@ -67,12 +66,8 @@ class Database:
 
         connection = await self.connect()
         cur = connection.cursor()
-        cur.execute(f"""SELECT * FROM {table} WHERE inserted > datetime("now", "-7 days")
-                    AND id = (SELECT MAX(id) FROM {table})""")
-        rows = cur.fetchall()
-        result = [dict(row) for row in rows]
-
-        return result[0]
+        cur.execute(f"""SELECT * FROM {table} WHERE id = (SELECT MAX(id) FROM {table})""")
+        return cur.fetchone()
 
     async def get_prev(self, table: str):
         """Get all rows from table"""
@@ -80,11 +75,8 @@ class Database:
 
         connection = await self.connect()
         cur = connection.cursor()
-        cur.execute(f"""SELECT * FROM {table} WHERE inserted > datetime("now", "-7 days")
-                    AND id = (SELECT MAX(id) FROM {table}) - 1""")
-        rows = cur.fetchall()
-        result = [dict(row) for row in rows]
-        return result[0]
+        cur.execute(f"""SELECT * FROM {table} WHERE id = (SELECT MAX(id) FROM {table}) - 1""")
+        return cur.fetchone()
 
     async def update_status(self, table: str, metric: str, value: str):
         """Update status in rows"""

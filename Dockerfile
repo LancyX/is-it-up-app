@@ -2,7 +2,8 @@ FROM python:3.11.7-slim-bookworm
 
 WORKDIR /app
 
-COPY ./ ./
+COPY ./ /app
+RUN mkdir /app/db
 
 RUN apt update && apt install locales -y
 
